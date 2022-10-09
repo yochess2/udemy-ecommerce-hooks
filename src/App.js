@@ -1,10 +1,13 @@
-import React from 'react'
+import { Outlet } from "react-router-dom"
+
+import NavBar from "./NavBar"
 
 const App = () => {
-	console.log('hello world')
+	console.log("APP - ROOT")
 	return (
-		<div>
-			hello
+		<div className="app">
+			<NavBar />
+			<Outlet />	
 		</div>
 	)
 }

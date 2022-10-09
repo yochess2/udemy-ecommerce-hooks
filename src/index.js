@@ -1,16 +1,48 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react"
+import ReactDOM from "react-dom/client"
+import { 
+    createBrowserRouter, 
+    RouterProvider,
+} from "react-router-dom"
 
-import "jquery";
+import "jquery"
 import "popper.js/dist/umd/popper"
+import "bootstrap/dist/js/bootstrap"
+import "bootstrap/dist/css/bootstrap.css"
+import "font-awesome/css/font-awesome.css"
+import "./index.css"
 
-import './index.css';
+import App from "./App"
+import NoMatchPage from "./NoMatchPage"
+import Register from "./Register"
+import Login from "./Login"
+import Dashboard from "./Dashboard"
 
-import App from './App';
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <App />,
+        errorElement: <NoMatchPage />,
+        children: [
+            {
+                path: "register",
+                element: <Register />,
+            },
+            {
+                path: "login",
+                element: <Login />,
+            },
+            {
+                path: "dashboard",
+                element: <Dashboard />,
+            },
+        ],
+    },
+])
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"))
 root.render(
     <React.StrictMode>
-        <App />
+        <RouterProvider router={router} />
     </React.StrictMode>
-);
+)
