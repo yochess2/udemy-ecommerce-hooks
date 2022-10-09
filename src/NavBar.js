@@ -43,10 +43,10 @@ const NavBar = () => {
 	)
 }
 
-export default NavBar
-
-const styles = {
+let styles = {
 	dropdown: {
 		marginRight: "100px"
 	}
 }
+
+export default NavBar

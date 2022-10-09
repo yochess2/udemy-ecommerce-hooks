@@ -5,10 +5,10 @@ import NavBar from "./NavBar"
 const App = () => {
 	console.log("APP - ROOT")
 	return (
-		<div className="app">
+		<>
 			<NavBar />
 			<Outlet />	
-		</div>
+		</>
 	)
 }
 

@@ -1,16 +1,35 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const Login = () => {
 	const [email, setEmail] = useState("abc@test.com")
 	const [password, setPassword] = useState("abc123")
 
-	console.log("Login Render - ", email, password)
+	useEffect(() => {
+		console.log("Login - ComponentDidMount ")
+		document.title = "Login - eCommerce"
+		return () => { console.log("Login - ComponentWillUnmount") }
+	}, [])
+
+	useEffect(() => {
+		if (email.indexOf("@") > 0) {
+			console.log('valid')
+		} else {
+			console.log('invalid')
+		}
+	}, [email])
+
+	useEffect(() => {
+		console.log("password", password)
+	}, [password])
+
 	return (
 		<div className="row">
 			<div className="col-lg-5 col-md-7 mx-auto">
 				<div className="card border-success shadow-lg mx-5">
 					<div className="card-header border-bottom border-success">
-						<h1 className="text-success text-center" style={styles.header}>Login</h1>
+						<h1 className="text-success text-center" style={styles.header}>
+							Login
+						</h1>
 					</div>
 					<div className="card-body border-bottom border-success">
 
@@ -26,10 +45,11 @@ const Login = () => {
 								onChange={event => setEmail(event.target.value)}
 								placeholder="Enter Email" />
 						</div>
-						
 						{/* email ends */}
+						
+						{/* password starts */}
 						<div className="mb-3">
-							<label htmlFor="login-password">Email</label>
+							<label htmlFor="login-password">Password</label>
 							<input
 								type="password"
 								className="form-control"
@@ -39,7 +59,7 @@ const Login = () => {
 								onChange={event => setPassword(event.target.value)}
 								placeholder="Type Password" />
 						</div>
-						{/* password starts */}
+						{/* password ends */}
 
 					</div>
 				</div> 
@@ -48,8 +68,10 @@ const Login = () => {
 	)
 }
 
-export default Login
-
-const styles = {
-	header: { fontSize: "40px" }
+let styles = {
+	header: { 
+		fontSize: "40px" 
+	}
 }
+
+export default Login
