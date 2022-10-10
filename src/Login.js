@@ -19,8 +19,8 @@ const Login = () => {
 	// const navigate = useNavigate()
 	const userContext = useContext(UserContext)
 
-	const [email, setEmail] = useState("")
-	const [password, setPassword] = useState("")
+	const [email, setEmail] = useState("scott@test.com")
+	const [password, setPassword] = useState("Scott123")
 
 	const [dirty, setDirty] = useState({
 		email: false,

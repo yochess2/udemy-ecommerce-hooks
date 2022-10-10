@@ -34,7 +34,9 @@ const App = () => {
 	return (
 		<UserContext.Provider value={{ user, setUser }}>
 			<NavBar />
-			<Outlet />	
+			<div className="container-fluid">
+				<Outlet />	
+			</div>
 		</UserContext.Provider>
 	)
 }
