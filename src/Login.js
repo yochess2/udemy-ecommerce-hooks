@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect, useCallback, useContext } from "react"
+// import { useNavigate } from "react-router-dom"
 import axios from "axios"
+
+import { UserContext } from "./UserContext"
 
 const url = "http://localhost:8000/users"
 const styles = {
@@ -10,7 +12,12 @@ const styles = {
 }
 
 const Login = () => {
-	const navigate = useNavigate()
+	// useEffect(() => {
+	// 	console.count('Login Count')
+	// })
+	
+	// const navigate = useNavigate()
+	const userContext = useContext(UserContext)
 
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
@@ -51,16 +58,18 @@ const Login = () => {
 	}, [email, password, errors])
 
 	useEffect(() => {
-		console.log("Login - ComponentDidMount ")
+		// console.log("Login - ComponentDidMount ")
 		document.title = "Login - eCommerce"
-		return () => { console.log("Login - ComponentWillUnmount") }
+		// return () => { console.log("Login - ComponentWillUnmount") }
 	}, [])
 
 	useEffect(validate, [validate])
 
-	useEffect(() => {
-		console.count('Login Count')
-	})
+	// useEffect(() => {
+	// 	if (userContext.user.isLoggedIn) {
+	// 		navigate("/dashboard")
+	// 	}
+	// }, [userContext.user, navigate])
 
 	return (
 		<div className="row">
@@ -129,12 +138,19 @@ const Login = () => {
 			axios.get(url, { params: { email, password } })
 			.then(res => {
 				if (res.data.length === 0) {
-					setMessage(<span className="text-danger">Unauthorized Login</span>)
-				} else {
-					setMessage(<span className="text-success">Success</span>)
-					navigate("/dashboard")
+					return setMessage(<span className="text-danger">Unauthorized Login</span>)
 				}
-
+				if (res.data.length > 1) {
+					return setMessage(<span className="text-danger">More than 2 users, Internal Error</span>)
+				}
+				setMessage(<span className="text-success">Success</span>)
+				const user = res.data[0]
+				userContext.setUser({ 
+					...userContext.user,
+					isLoggedIn: true,
+					currentUserName: user.fullName,
+					currentUserId: user.id, 
+				})
 			})
 			.catch(err => {
 				console.log('error: ', err)

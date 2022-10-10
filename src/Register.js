@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect, useCallback, useContext } from "react"
+// import { useNavigate } from "react-router-dom"
 import axios from "axios"
+
+import { UserContext } from "./UserContext"
 
 const url = "http://localhost:8000/users"
 const styles = {
@@ -10,7 +12,12 @@ const styles = {
 }
 
 const Register = () => {
-	const navigate = useNavigate()
+	// useEffect(() => {
+	// 	console.count('Register Count')
+	// })
+	
+	// const navigate = useNavigate()
+	const userContext = useContext(UserContext)
 
 	const [state, setState] = useState({
 		email: "",
@@ -107,16 +114,18 @@ const Register = () => {
 
 	//ComponentDidMount and ComponentWillUnmount
 	useEffect(() => {
-		console.log("Register - ComponentDidMount ")
+		// console.log("Register - ComponentDidMount ")
 		document.title = "Register - eCommerce"
-		return () => { console.log("Register - ComponentWillUnmount") }
+		// return () => { console.log("Register - ComponentWillUnmount") }
 	}, [])
 	
 	useEffect(validate, [validate])
 
-	useEffect(() => {
-		console.count('Register Count')
-	})
+	// useEffect(() => {
+	// 	if (userContext.user.isLoggedIn) {
+	// 		navigate("/dashboard")
+	// 	}
+	// }, [userContext.user, navigate])
 
 	return (
 		<div className="row">
@@ -323,7 +332,13 @@ const Register = () => {
 			})
 			.then(res => {
 				setMessage(<span className="text-success">Success</span>)
-				navigate("/dashboard")
+				const user = res.data
+				userContext.setUser({ 
+					...userContext.user,
+					isLoggedIn: true,
+					currentUserName: user.fullName,
+					currentUserId: user.id, 
+				})
 			})
 			.catch(err => setMessage(<span className="text-danger">Errors</span>))
 		} else {

@@ -111,6 +111,36 @@
       "gender": "male",
       "country": "UK",
       "receiveNewsLetters": true
+    },
+    {
+      "email": "dw@dw.com",
+      "password": "Abc123",
+      "fullName": "Drake Wang",
+      "dateOfBirth": "1111-11-11",
+      "gender": "male",
+      "country": "USA",
+      "receiveNewsLetter": "true",
+      "id": 2
+    },
+    {
+      "email": "johndoe@gmail.com",
+      "password": "Abc123",
+      "fullName": "John Doe",
+      "dateOfBirth": "2222-01-13",
+      "gender": "male",
+      "country": "USA",
+      "receiveNewsLetter": "true",
+      "id": 3
+    },
+    {
+      "email": "no@no.com",
+      "password": "Nono23",
+      "fullName": "nono",
+      "dateOfBirth": "1111-11-11",
+      "gender": "male",
+      "country": "USA",
+      "receiveNewsLetter": "",
+      "id": 4
     }
   ],
   "orders": [

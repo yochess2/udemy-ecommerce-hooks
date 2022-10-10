@@ -1,13 +1,15 @@
-import { useEffect } from "react"
+import { useEffect, useContext } from "react"
+
+import { UserContext } from "./UserContext"
 
 const Dashboard = () => {
-	console.log("Dashboard Render - ")
+	const userContext = useContext(UserContext)
 
 	useEffect(() => {
-		console.log("Dashboard - ComponentDidMount ")
+		// console.log("Dashboard - ComponentDidMount ")
 		document.title = "Dashboard - eCommerce"
-		return () => { console.log("Dashboard - ComponentWillUnmount") }
-	}, [])
+		// return () => { console.log("Dashboard - ComponentWillUnmount") }
+	}, [userContext])
 
 	return (
 		<div>
