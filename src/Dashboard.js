@@ -2,6 +2,8 @@ import { useEffect, useContext, useState } from "react"
 import axios from "axios"
 
 import { UserContext } from "./UserContext"
+import { OrdersService, ProductsService } from "./Service"
+
 import Order from "./Order"
 
 const urls = {
@@ -22,6 +24,9 @@ const Dashboard = () => {
 	const [orders, setOrders] = useState([])
 	const userContext = useContext(UserContext)
 
+	const { getPreviousOrders, getCart } = OrdersService
+	const { getProductbyProductId } = ProductsService
+
 	useEffect(() => {
 		// console.log("Dashboard - ComponentDidMount ")
 		document.title = "Dashboard - eCommerce"
@@ -34,15 +39,13 @@ const Dashboard = () => {
 		})
 		.then(res => {
 			ordersResponse.forEach(order => {
-				order.product = res.data.find(product => product.id === order.productId)
+				order.product = getProductbyProductId(res.data, order.productId)
 			})
 			setOrders(ordersResponse)
-			console.log(ordersResponse)
 		})
 		.catch(err => {
 			console.log("err", err)
 		})
-
 
 	}, [userContext.user.currentUserId])
 
@@ -108,14 +111,6 @@ const Dashboard = () => {
 			</div>
 		</div>
 	)
-}
-
-function getPreviousOrders(orders) {
-	return orders.filter(order => order.isPaymentCompleted)
-}
-
-function getCart(orders) {
-	return orders.filter(order => !order.isPaymentCompleted)
 }
 
 export default Dashboard
