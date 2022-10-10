@@ -1,4 +1,12 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import axios from "axios"
+
+const url = "http://localhost:8000/users"
+const styles = {
+	header: { 
+		fontSize: "40px" 
+	}
+}
 
 const Register = () => {
 	const [state, setState] = useState({
@@ -10,7 +18,6 @@ const Register = () => {
 		country: "",
 		receiveNewsLetter: ""
 	})
-
 	const [countries] = useState([
 		{ id: 1, countryName: "India" },
 		{ id: 2, countryName: "USA" },
@@ -19,18 +26,93 @@ const Register = () => {
 		{ id: 5, countryName: "France" },
 		{ id: 6, countryName: "Brazil" },
 		{ id: 7, countryName: "Mexico" },
-		{ id: 8, countryName: "Canada" },
-
+		{ id: 8, countryName: "Canada" }
 	])
+	const [errors, setErrors] = useState({
+		email: [],
+		password: [],
+		fullName: [],
+		dateOfBirth: [],
+		gender: [],
+		country: [],
+		receiveNewsLetter: [],
+	})
+	const [dirty, setDirty] = useState({
+		email: false,
+		password: false,
+		fullName: false,
+		dateOfBirth: false,
+		gender: false,
+		country: false,
+		receiveNewsLetter: false,
+	})
+	const [message, setMessage] = useState("")
 
+	const validate = useCallback(() => {
+		let errorsData = {
+			email: [],
+			password: [],
+			fullName: [],
+			dateOfBirth: [],
+			gender: [],
+			country: [],
+			receiveNewsLetter: [],
+		}
+		//Email
+		if (!state.email) {
+			errorsData.email.push("Email can't be blank")
+		}
+		const validEmailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
+		if (state.email && !validEmailRegex.test(state.email)) {
+			errorsData.email.push("Proper email address is expected")
+		}
+		//Password
+		if (!state.password) {
+			errorsData.password.push("Password cannot be blank")
+		}
+	    const validPasswordRegex = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15})/
+		if (state.password && !validPasswordRegex.test(state.password)) {
+			errorsData.password.push("Password should be 6 to 15 characters long with at least one uppercase letter, one lowercase letter, and one digit")
+		}
+		//Full Name
+		if (!state.fullName) {
+			errorsData.fullName.push("Full name cannot be blank")
+		}
+		//Date of Birth
+		if (!state.dateOfBirth) {
+			errorsData.dateOfBirth.push("Date of birth cannot be blank")
+		}
+		//Date of Birth
+		if (!state.gender) {
+			errorsData.gender.push("Please select either male or female")
+		}
+		//Country
+		if (!state.country) {
+			errorsData.country.push("Country cannot be blank")
+		}
+
+		let reRender = false
+		for (let control in errorsData) {
+			if (errorsData[control][0] !== errors[control][0]) {
+				reRender = true
+			}
+		}
+		if (reRender === true) {
+			setErrors(errorsData)
+		}
+	}, [state, errors])
+
+	//ComponentDidMount and ComponentWillUnmount
 	useEffect(() => {
 		console.log("Register - ComponentDidMount ")
 		document.title = "Register - eCommerce"
 		return () => { console.log("Register - ComponentWillUnmount") }
 	}, [])
- 
+	
+	useEffect(validate, [validate])
+
 	useEffect(() => {
-		console.log(state)
+		console.count('Register Count')
 	})
 
 	return (
@@ -41,6 +123,14 @@ const Register = () => {
 						<h1 className="text-primary text-center" style={styles.header}>
 							Register
 						</h1>
+						<ul className="text-danger">
+							{Object.keys(errors).map(control => {
+								if (!dirty[control]) { return "" }
+								return errors[control].map(err => 
+									<li key={err}>{err}</li>
+								)
+							})}
+						</ul>
 					</div>
 					<div className="card-body border-bottom border-primary">
 						
@@ -55,9 +145,11 @@ const Register = () => {
 									className="form-control"
 									name="email"
 									value={state.email}
-									onChange={(event) => {
-										setState({...state, [event.target.name]:event.target.value})
-									}} />
+									onChange={e => setState({...state, [e.target.name]:e.target.value})} 
+									onBlur={e => setDirty({...dirty,[e.target.name]:true})} />
+								<div className="text-danger">
+									{dirty["email"]&&errors["email"][0]?errors["email"]:""}
+								</div>
 							</div>
 						</div>
 						{/* email ends */}
@@ -73,9 +165,11 @@ const Register = () => {
 									className="form-control"
 									name="password"
 									value={state.password}
-									onChange={(event) => {
-										setState({...state, [event.target.name]:event.target.value})
-									}} />
+									onChange={e => setState({...state, [e.target.name]:e.target.value})} 
+									onBlur={e => setDirty({...dirty,[e.target.name]:true})} />
+								<div className="text-danger">
+									{dirty["password"]&&errors["password"][0]?errors["password"]:""}
+								</div>
 							</div>
 						</div>
 						{/* password ends */}
@@ -91,9 +185,11 @@ const Register = () => {
 									className="form-control"
 									name="fullName"
 									value={state.fullName}
-									onChange={(event) => {
-										setState({...state, [event.target.name]:event.target.value})
-									}} />
+									onChange={e => setState({...state, [e.target.name]:e.target.value})} 
+									onBlur={e => setDirty({...dirty,[e.target.name]:true})} />
+								<div className="text-danger">
+									{dirty["fullName"]&&errors["fullName"][0]?errors["fullName"]:""}
+								</div>
 							</div>
 						</div>
 						{/* fullName ends */}
@@ -108,9 +204,11 @@ const Register = () => {
 									className="form-control"
 									name="dateOfBirth"
 									value={state.dateOfBirth}
-									onChange={(event) => {
-										setState({...state, [event.target.name]:event.target.value})
-									}} />
+									onChange={e => setState({...state, [e.target.name]:e.target.value})} 
+									onBlur={e => setDirty({...dirty,[e.target.name]:true})} />
+								<div className="text-danger">
+									{dirty["dateOfBirth"]&&errors["dateOfBirth"][0]?errors["dateOfBirth"]:""}
+								</div>
 							</div>
 						</div>
 						{/* dateOfBirth ends */}
@@ -120,6 +218,7 @@ const Register = () => {
 							<label className="col-lg-4 col-form-label">Gender</label>
 							<div className="col-lg-8">
 								<div className="form-check"> 
+									<label className="form-check-label form-check-inline" htmlFor="register-gender-male">Male</label>
 									<input
 										id="register-gender-male"
 										type="radio" 
@@ -127,12 +226,11 @@ const Register = () => {
 										value="male"
 										checked={state.gender === "male" ? true : false}
 										name="gender"
-										onChange={(event) => {
-											setState({...state, [event.target.name]:event.target.value})
-										}} />
-									<label className="form-check-label form-check-inline" htmlFor="register-gender-male">Male</label>
+										onChange={e => setState({...state, [e.target.name]:e.target.value})} 
+										onBlur={e => setDirty({...dirty,[e.target.name]:true})} />
 								</div>
 								<div className="form-check"> 
+									<label className="form-check-label form-check-inline" htmlFor="register-gender-female">Female</label>
 									<input
 										id="register-gender-female"
 										type="radio" 
@@ -140,10 +238,11 @@ const Register = () => {
 										value="female"
 										checked={state.gender === "female" ? true : false}
 										name="gender"
-										onChange={(event) => {
-											setState({...state, [event.target.name]:event.target.value})
-										}} />
-									<label className="form-check-label form-check-inline" htmlFor="register-gender-female">Female</label>
+										onChange={e => setState({...state, [e.target.name]:e.target.value})} 
+										onBlur={e => setDirty({...dirty,[e.target.name]:true})} />
+								</div>
+								<div className="text-danger">
+									{dirty["gender"]&&errors["gender"][0]?errors["gender"]:""}
 								</div>
 							</div>
 						</div>
@@ -155,18 +254,18 @@ const Register = () => {
 							<div className="col-lg-8">
 								<select
 									id="register-country"
-									type="select" 
 									className="form-select"
 									name="country"
-									value={state.country}
-									onChange={(event) => {
-										console.log(event.target)
-										setState({...state, [event.target.name]:event.target.value})
-									}} >
-									{countries.map(country => <option key={country.id} value="country">{country.countryName}</option>
-
+									onChange={e => setState({...state, [e.target.name]:e.target.value})}  
+									onBlur={e => setDirty({...dirty,[e.target.name]:true})} >
+									<option value="">Select a country</option>
+									{countries.map(country => 
+									<option key={country.id} value={country.countryName}>{country.countryName}</option>
 									)}
 								</select>
+								<div className="text-danger">
+									{dirty["country"]&&errors["country"][0]?errors["country"]:""}
+								</div>
 							</div>
 						</div>
 						{/* country ends */}
@@ -183,9 +282,7 @@ const Register = () => {
 										value="true"
 										checked={state.receiveNewsLetter ? true : false}
 										name="receiveNewsLetter"
-										onChange={(event) => {
-											setState({...state, [event.target.name]:event.target.checked})
-										}} />
+										onChange={e => setState({...state, [e.target.name]:e.target.value})} />
 									<label className="form-check-label form-check-inline" htmlFor="register-receiveNewsLetter">
 										Receive News Letter
 									</label>
@@ -193,17 +290,48 @@ const Register = () => {
 							</div>
 						</div>
 						{/* receiveNewsLetter ends */}
-
+					</div>
+					<div className="card-footer text-center">
+						<div className="m-1">{message}</div>
+						<div>
+							<button className="btn btn-primary m-2" onClick={onRegisterClick}>
+								Register
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	)
-}
+	function onRegisterClick() {
+		const dirtyData = {...dirty}
+		Object.keys(dirty).forEach(control => dirtyData[control] = true)
+		setDirty(dirtyData)
+		validate()
 
-let styles = {
-	header: { 
-		fontSize: "40px" 
+		if (isValid()) {
+			axios.post(url, {
+				email: state.email,
+				password: state.password,
+				fullName: state.fullName,
+				dateOfBirth: state.dateOfBirth,
+				gender: state.gender,
+				country: state.country,
+				receiveNewsLetter: state.receiveNewsLetter,
+			})
+			.then(res => setMessage(<span className="text-success">Success</span>))
+			.catch(err => setMessage(<span className="text-danger">Errors</span>))
+		} else {
+			setMessage(<span className="text-danger">Errors</span>)
+		}
+	}
+
+	function isValid() {
+		let valid = true
+		for (let key in errors) {
+			if (errors[key].length > 0) { valid = false }
+		}
+		return valid
 	}
 }
 

@@ -1,6 +1,9 @@
 {
   "brands": [
-    { "id": 1, "brandName": "Apple" },
+    {
+      "id": 1,
+      "brandName": "Apple"
+    },
     {
       "id": 2,
       "brandName": "Sony"
