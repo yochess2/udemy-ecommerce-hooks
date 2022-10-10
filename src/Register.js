@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 import axios from "axios"
 
 const url = "http://localhost:8000/users"
@@ -9,6 +10,8 @@ const styles = {
 }
 
 const Register = () => {
+	const navigate = useNavigate()
+
 	const [state, setState] = useState({
 		email: "",
 		password: "",
@@ -307,7 +310,6 @@ const Register = () => {
 		const dirtyData = {...dirty}
 		Object.keys(dirty).forEach(control => dirtyData[control] = true)
 		setDirty(dirtyData)
-		validate()
 
 		if (isValid()) {
 			axios.post(url, {
@@ -319,7 +321,10 @@ const Register = () => {
 				country: state.country,
 				receiveNewsLetter: state.receiveNewsLetter,
 			})
-			.then(res => setMessage(<span className="text-success">Success</span>))
+			.then(res => {
+				setMessage(<span className="text-success">Success</span>)
+				navigate("/dashboard")
+			})
 			.catch(err => setMessage(<span className="text-danger">Errors</span>))
 		} else {
 			setMessage(<span className="text-danger">Errors</span>)
@@ -328,7 +333,7 @@ const Register = () => {
 
 	function isValid() {
 		let valid = true
-		for (let key in errors) {
+		for (const key in errors) {
 			if (errors[key].length > 0) { valid = false }
 		}
 		return valid

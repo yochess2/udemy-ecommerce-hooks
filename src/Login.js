@@ -1,8 +1,54 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
+
+const url = "http://localhost:8000/users"
+const styles = {
+	header: { 
+		fontSize: "40px" 
+	}
+}
 
 const Login = () => {
-	const [email, setEmail] = useState("abc@test.com")
-	const [password, setPassword] = useState("abc123")
+	const navigate = useNavigate()
+
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
+
+	const [dirty, setDirty] = useState({
+		email: false,
+		password: false,
+	})
+
+	const [errors, setErrors] = useState({
+		email: [],
+		password: [],
+	})
+
+	const [message, setMessage] = useState("")
+
+	const validate = useCallback(() => {
+		let errorsData = { email: [], password: [] }
+		if (!email) {
+			errorsData.email.push("Email cannot be blank")
+		}
+		const validEmailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
+		if (email && !validEmailRegex.test(email)) {
+			errorsData.email.push("Proper email address is expected")
+		}
+		if (!password) {
+			errorsData.password.push("Password cannot be blank")
+		}
+		let reRender = false
+		for (let control in errorsData) {
+			if (errorsData[control][0] !== errors[control][0]) {
+				reRender = true
+			}
+		}
+		if (reRender === true) {
+			setErrors(errorsData)
+		}
+	}, [email, password, errors])
 
 	useEffect(() => {
 		console.log("Login - ComponentDidMount ")
@@ -10,17 +56,11 @@ const Login = () => {
 		return () => { console.log("Login - ComponentWillUnmount") }
 	}, [])
 
-	useEffect(() => {
-		if (email.indexOf("@") > 0) {
-			console.log('valid')
-		} else {
-			console.log('invalid')
-		}
-	}, [email])
+	useEffect(validate, [validate])
 
 	useEffect(() => {
-		console.log("password", password)
-	}, [password])
+		console.count('Login Count')
+	})
 
 	return (
 		<div className="row">
@@ -42,8 +82,11 @@ const Login = () => {
 								id="login-email"
 								name="email"
 								value={email}
-								onChange={event => setEmail(event.target.value)}
+								onChange={e => setEmail(e.target.value)}
 								placeholder="Enter Email" />
+							<div className="text-danger">
+								{dirty["email"]&&errors["email"][0]?errors["email"]:""}
+							</div>
 						</div>
 						{/* email ends */}
 						
@@ -56,21 +99,58 @@ const Login = () => {
 								id="login-password"
 								name="password"
 								value={password}
-								onChange={event => setPassword(event.target.value)}
+								onChange={e => setPassword(e.target.value)}
 								placeholder="Type Password" />
+							<div className="text-danger">
+								{dirty["password"]&&errors["password"][0]?errors["password"]:""}
+							</div>
 						</div>
 						{/* password ends */}
 
+					</div>
+					<div className="card-footer text-center">
+						<div className="m-1">{message}</div>
+						<button className="btn btn-success m-2" onClick={onLoginClick}>Login</button>
 					</div>
 				</div> 
 			</div>
 		</div>
 	)
-}
 
-let styles = {
-	header: { 
-		fontSize: "40px" 
+	function onLoginClick(e) {
+		e.preventDefault()
+		const dirtyData = {...dirty}
+		Object.keys(dirty).forEach(control => {
+			dirtyData[control] = true
+		})
+		setDirty(dirtyData)
+
+		if (isValid()) {
+			axios.get(url, { params: { email, password } })
+			.then(res => {
+				if (res.data.length === 0) {
+					setMessage(<span className="text-danger">Unauthorized Login</span>)
+				} else {
+					setMessage(<span className="text-success">Success</span>)
+					navigate("/dashboard")
+				}
+
+			})
+			.catch(err => {
+				console.log('error: ', err)
+				setMessage(<span className="text-danger">Unable to Connect to Server</span>)
+			})
+		}
+
+
+	}
+
+	function isValid() {
+		let valid = true
+		for (const key in errors) {
+			if (errors[key].length > 0) { valid = false }
+		}
+		return valid
 	}
 }
 
