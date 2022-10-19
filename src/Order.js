@@ -7,11 +7,33 @@ const styles = {
 	}
 }
 
-const Order = ({ productId, productName, quantity, price }) => {
+const Order = ({ productId, productName, quantity, price, isPaymentCompleted, onBuyNowClick, orderId, userId, onDeleteClick }) => {
+	console.count('i ran 3 times')
 	return (
 		<div className="card my-2 shadow">
 			<div className="card-body">
-				<h6><i className="fa fa-arrow-right me me-1" />{productName}</h6>
+				<h6>
+					<i className="fa fa-arrow-right me me-1" />{productName}
+						{!isPaymentCompleted ? 
+							<div className="float-right">
+								<button 
+									className="btn btn-sm btn-info me-2"
+									onClick={() => {
+										onBuyNowClick(orderId, userId, productId, quantity)
+									}}
+								>
+									<i className="fa fa-truck" />{" "}Buy Now
+								</button>
+								<button 
+									className="btn btn-sm btn-danger me-2"
+									onClick={() => onDeleteClick(orderId)}
+								>
+									<i className="fa fa-trash-o" />{" "}Delete
+								</button>
+							</div>
+						: 
+						""}
+				</h6>
 				<table className="table table-sm table-borderless mt-1">
 					<tbody>
 						<tr>
@@ -37,4 +59,4 @@ Order.propTypes = {
 	price: PropTypes.number
 }
 
-export default Order
+export default React.memo(Order)

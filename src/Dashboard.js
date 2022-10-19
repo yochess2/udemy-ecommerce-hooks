@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from "react"
+import { useEffect, useContext, useState, useCallback } from "react"
 import axios from "axios"
 
 import { UserContext } from "./UserContext"
@@ -9,6 +9,7 @@ import Order from "./Order"
 const urls = {
 	orders: "http://localhost:8000/orders",
 	products: "http://localhost:8000/products",
+	orderId: "http://localhost:8000/orders/"
 }
 
 const styles = {
@@ -23,14 +24,15 @@ const styles = {
 const Dashboard = () => {
 	const [orders, setOrders] = useState([])
 	const userContext = useContext(UserContext)
+	const [showOrderDeletedAlert, setShowOrderDeletedAlert] = useState(false)
+	const [showOrderPlacedAlert, setShowOrderPlacedAlert] = useState(false)
+
 
 	const { getPreviousOrders, getCart } = OrdersService
 	const { getProductbyProductId } = ProductsService
 
-	useEffect(() => {
-		// console.log("Dashboard - ComponentDidMount ")
-		document.title = "Dashboard - eCommerce"
-		// return () => { console.log("Dashboard - ComponentWillUnmount") }
+	const loadData = useCallback(() => {
+		console.log('loading')
 		let ordersResponse
 		axios.get(urls.orders, { params: { userId: userContext.user.currentUserId } })
 		.then(res => {
@@ -46,13 +48,57 @@ const Dashboard = () => {
 		.catch(err => {
 			console.log("err", err)
 		})
+	}, [userContext.user.currentUserId, getProductbyProductId])
 
-	}, [userContext.user.currentUserId])
+	const onBuyNowClick = useCallback((orderId, userId, productId, quantity) => {
+		if (window.confirm("Do you want to place order for this product?")) {
+			const updateOrder = {
+				id: orderId,
+				productId: productId,
+				userId: userId,
+				quantity: quantity,
+				isPaymentCompleted: true
+			}
+			const headers = {
+				"Content-type": "application/json"
+			}
 
+			axios.put(urls.orderId+orderId, updateOrder, headers)
+				.then(res => {
+					loadData()
+					setShowOrderPlacedAlert(true)
+				})
+		}
+	}, [loadData])
+
+	const onDeleteClick = useCallback((orderId) => {
+		if (window.confirm("Are you sure to delete this item from cart?")) {
+			axios
+				.delete(urls.orderId+orderId)
+				.then(res => {
+					console.log(res.body)
+					loadData()
+					setShowOrderDeletedAlert(true)
+				})
+		}
+	}, [loadData])
+
+	useEffect(() => {
+		// console.log("Dashboard - ComponentDidMount ")
+		document.title = "Dashboard - eCommerce"
+		loadData()
+		return () => { console.log("Dashboard - ComponentWillUnmount") }
+
+	}, [userContext.user.currentUserId, loadData])
 	return (
 		<div className="row">
 			<div className="col-12 py-3 header" style={styles.header}>
-				<h4><i className="fa fa-dashboard me-1" />Dashboard</h4>
+				<h4>
+					<i className="fa fa-dashboard me-1" />Dashboard{" "}
+					<button className="btn btn-sm btn-info text-white" onClick={loadData}>
+						<i className="fa fa-refresh">Refresh</i>
+					</button>
+				</h4>
 			</div>
 			<div className="col-12">
 
@@ -71,13 +117,16 @@ const Dashboard = () => {
 						{getPreviousOrders(orders).map(order => 
 							<Order 
 								key={order.id} 
-								orderId={order.orderId}
+								orderId={order.id}
 								productId={order.productId}
 								userId={order.userId}
 								isPaymentCompleted={order.isPaymentCompleted}
 								quantity={order.quantity}
 								productName={order.product && order.product.productName}
-								price={order.product && order.product.price} />
+								price={order.product && order.product.price} 
+								onBuyNowClick={onBuyNowClick}
+								onDeleteClick={onDeleteClick}
+							/>
 						)}
 					</div>
 					{/* previous order ends */}
@@ -90,18 +139,45 @@ const Dashboard = () => {
 						{getCart(orders).length}
 						</span>
 					</h4>
+
+					{showOrderPlacedAlert ? 
+					<div className="alert alert-success alert-dismissible fade show mt-1" role="alert">
+						Your Order has been placed. 
+						<button className="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close">
+						</button>
+					</div>
+					:
+					""
+					}
+
+					{showOrderDeletedAlert ? 
+					<div className="col-12">
+						<div className="alert alert-danger alert-dismissible fade show mt-1" role="alert">
+							Your Order has been removed from teh cart
+							<button className="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close">
+							</button>
+						</div>
+					</div>
+					:
+					""
+					}
+
 					{(getCart(orders).length === 0) &&
 					<div className="text-danger">No Orders</div>
 					}
 					{(getCart(orders).map(order =>
-						<Order key={order.id} 
-						orderId={order.orderId}
-						productId={order.productId}
-						userId={order.userId}
-						isPaymentCompleted={order.isPaymentCompleted}
-						quantity={order.quantity}
-						productName={order.product && order.product.productName}
-						price={order.product && order.product.price} />
+						<Order 
+							key={order.id} 
+							orderId={order.id}
+							productId={order.productId}
+							userId={order.userId}
+							isPaymentCompleted={order.isPaymentCompleted}
+							quantity={order.quantity}
+							productName={order.product && order.product.productName}
+							price={order.product && order.product.price} 
+							onBuyNowClick={onBuyNowClick}
+							onDeleteClick={onDeleteClick}
+						/>
 
 					))}
 					</div>

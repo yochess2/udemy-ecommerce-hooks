@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect,  } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router-dom"
 
 import { UserContext } from "./UserContext"
@@ -13,7 +13,7 @@ const App = () => {
 		isLoggedIn: false,
 		currentUserId: null,
 		currentUserName: null,
-	})
+	}) 
 
 	useEffect(() => {
 		console.count("ROOT")
@@ -30,6 +30,19 @@ const App = () => {
 			navigate("/login")
 		}
 	}, [user.isLoggedIn, location, navigate])
+
+
+	// const [test, setTest] = useState()
+	// const fn = useCallback(() => {
+	// 	console.count('forever')
+	// 	// setTest([])
+	// }, [test])
+	// useEffect(() => {
+	// 	console.log('oka')
+	// 	fn()
+	// }, [fn])
+
+
 
 	return (
 		<UserContext.Provider value={{ user, setUser }}>
