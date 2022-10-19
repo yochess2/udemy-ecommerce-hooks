@@ -28,24 +28,30 @@ const NavBar = () => {
 								<i className="fa fa-dashboard me-1"/>Dashboard 
 							</NavLink>
 						</li>
-						}
-						{/* Dashboard end */}
+						}{/* Dashboard end */}
+
+						{/* Store */}
+						{userContext.user.isLoggedIn && 
+						<li className="nav-item">
+							<NavLink className="nav-link" aria-current="page" to="store">
+								<i className="fa fa-shopping-bag me-1"/>Store 
+							</NavLink>
+						</li>
+						}{/* Store End */}
 
 						{/* Login start */}
 						{!userContext.user.isLoggedIn &&
 						<li className="nav-item">
 							<NavLink className="nav-link" to="login">Login</NavLink>
 						</li>
-						}
-						{/* Login end */}
+						}{/* Login end */}
 
 						{/* Register start */}
 						{!userContext.user.isLoggedIn &&
 						<li className="nav-item">
 							<NavLink className="nav-link" to="register">Register</NavLink>
 						</li>	
-						}
-						{/* Register end */}
+						}{/* Register end */}
 					</ul>
 
 					{/* right box starts */}

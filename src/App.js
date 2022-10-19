@@ -29,6 +29,9 @@ const App = () => {
 		if (!user.isLoggedIn && location.pathname === "/dashboard") {
 			navigate("/login")
 		}
+		if (!user.isLoggedIn && location.pathname === "/store") {
+			navigate("/login")
+		}
 	}, [user.isLoggedIn, location, navigate])
 
 

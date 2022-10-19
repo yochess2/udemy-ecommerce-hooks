@@ -17,6 +17,7 @@ import NoMatchPage from "./NoMatchPage"
 import Register from "./Register"
 import Login from "./Login"
 import Dashboard from "./Dashboard"
+import Store from "./Store"
 
 const router = createBrowserRouter([
     {
@@ -36,6 +37,11 @@ const router = createBrowserRouter([
                 path: "dashboard",
                 element: <Dashboard />,
             },
+            {
+                path: "store",
+                element: <Store />,
+            },
+
         ],
     },
 ])
